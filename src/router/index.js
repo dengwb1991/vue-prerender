@@ -1,18 +1,39 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
-import home from './home'
+import Index from '@/components/Index'
 
 Vue.use(Router)
 
-export default new Router({
+const requireRouter = require.context('.', false, /\.js/)
+
+let routes = []
+requireRouter.keys().forEach(fileName => {
+  if (fileName === './index.js') return
+  const requireConfig = requireRouter(fileName)
+  const routerArr = requireConfig.default || requireConfig
+  routes = [ ...routes, ...routerArr ]
+})
+
+const router = new Router({
   mode: 'history',
   routes: [
-    ...home,
+    ...routes,
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'Index',
+      meta: {
+        backgroundColor: 'black',
+        title: 'Dengwb Web'
+      },
+      component: Index
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  window.document.body.style.backgroundColor = to.meta.backgroundColor || '#FFF'
+  document.title = to.query.title || to.meta.title
+  next()
+})
+
+export default router

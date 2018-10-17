@@ -23,11 +23,14 @@ module.exports = {
   rules: {
     // allow async-await
     'generator-star-spacing': 'off',
+    'space-before-function-paren': 0,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'eol-last': 0,
     'no-undef': 0,
-    'eqeqeq': 0,
-    'camelcase': 0
+    eqeqeq: 0,
+    camelcase: 0,
+    'comma-dangle': 0,
+    'no-multi-spaces': ['error', { ignoreEOLComments: true }] // 注释格式
   }
 }
