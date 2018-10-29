@@ -22,7 +22,6 @@ const router = new Router({
       path: '/',
       name: 'Index',
       meta: {
-        backgroundColor: 'black',
         title: 'Dengwb Web'
       },
       component: Index
