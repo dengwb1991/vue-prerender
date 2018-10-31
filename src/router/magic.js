@@ -7,5 +7,13 @@ export default [
       title: 'Dengwb Web'
     },
     component: () => import('@/components/Magic/FireLogoBySvg.vue')
+  },
+  {
+    path: '/magic/shakeBox',
+    name: 'shakeBox',
+    meta: {
+      title: 'Dengwb Web'
+    },
+    component: () => import('@/components/Magic/ShakeBox.vue')
   }
 ]
