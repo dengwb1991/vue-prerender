@@ -4,10 +4,12 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import VueDND from 'awe-dnd'
+import dragging from './plugins/dragging.js'
 
 Vue.config.productionTip = false
 
 Vue.use(VueDND)
+Vue.use(dragging)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
