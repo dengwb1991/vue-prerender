@@ -1,23 +1,27 @@
 <!-- 抖动 -->
 <template>
-  <div class="shake-box">
-    <div :class="['box', item.isShaking !== false && isAnimation]"
-         v-for="(item, index) in arr"
-         :style="{
-           'background-color': item.color,
-           left: `${item.left}px`,
-           top: `${item.top}px`,
-           transition: item.transition,
-           'z-index': item.zIndex,
-           'pointer-events': item.pointerEvents
-         }"
-         :key="index"
-         @touchstart="doTouchStart($event, item)"
-         @touchmove="doTouchMove($event, index)"
-         @touchend="doTouchEnd($event, index)">
-      {{item.text}}
+  <div class="aaa">
+    <div class="shake-box">
+      <div :class="['box', item.isShaking !== false && isAnimation]"
+           v-for="(item, index) in arr"
+           :style="{
+             'background-color': item.color,
+             left: `${item.left}px`,
+             top: `${item.top}px`,
+             transition: item.transition,
+             'z-index': item.zIndex,
+             'pointer-events': item.pointerEvents
+           }"
+           :data-index="index"
+           :key="index"
+           @touchstart="doTouchStart($event, item)"
+           @touchmove="doTouchMove($event, index)"
+           @touchend="doTouchEnd($event, index)">
+        {{item.text}}
+      </div>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -68,10 +72,29 @@ export default {
           zIndex: 1,
           pointerEvents: 'none'
         })
-        const el = this.getOverElementFromTouch(event)
-        if (!this.lock && el.getAttribute('class').includes('animat') && el !== this.checkedItem.el) {
-          console.dir(el)
-        }
+        let el = this.getBlockEl(this.getOverElementFromTouch(event))
+
+        if (!el || !this.checkedItem) return
+
+        if (this.lock || !el.getAttribute('class') || !el.getAttribute('class').includes('animat') || el === this.checkedItem.el) return
+
+        this.lock = true
+        const targetIndex = el.getAttribute('data-index')
+        // console.log(this.arr[index].left)
+        this.$set(this.arr, targetIndex, {
+          ...this.arr[targetIndex],
+          left: this.checkedItem.left,
+          top: this.checkedItem.top,
+          transition: 'all 0.4s ease'
+        })
+        this.resetTimer = setTimeout(() => {
+          this.$set(this.arr, index, {
+            ...this.arr[index],
+            transition: null
+          })
+          this.lock = false
+          clearTimeout(this.resetTimer)
+        }, 400)
       }
     },
     doTouchEnd (event, index) {
