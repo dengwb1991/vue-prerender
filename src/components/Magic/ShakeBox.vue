@@ -14,7 +14,7 @@
            }"
            :data-index="index"
            :key="index"
-           @touchstart="doTouchStart($event, item)"
+           @touchstart="doTouchStart($event, item, index)"
            @touchmove="doTouchMove($event, index)"
            @touchend="doTouchEnd($event, index)">
         {{item.text}}
@@ -33,7 +33,10 @@ export default {
       resetTimer: 0,  // 重置位置timer
       longClick: false,  // 是否长按
       checkedItem: null,  // 选中的元素
+      targetItem: null,
       lock: false,
+      top: 0,
+      left: 0,
       arr: [
         { text: 'D', color: 'red' },
         { text: 'E', color: 'yellow' },
@@ -45,18 +48,26 @@ export default {
     }
   },
   methods: {
-    doTouchStart (event, item) {
+    doTouchStart (event, item, index) {
       event.preventDefault()
       this.timer = setTimeout(() => {
         this.longClick = true
         this.animat = true
-      }, 800)
+      }, 500)
+      this.targetItem = null
       this.checkedItem = {
         ...item,
         x: event.touches[0].pageX,
         y: event.touches[0].pageY,
+        index,
         el: this.getBlockEl(event.target)
       }
+      this.top = this.arr[index].top
+      this.left = this.arr[index].left
+      this.$set(this.arr, index, {
+        ...this.arr[index],
+        transition: null
+      })
     },
     doTouchMove (event, index) {
       event.preventDefault()
@@ -69,7 +80,7 @@ export default {
           left: x + this.checkedItem.left,
           top: y + this.checkedItem.top,
           isShaking: false,
-          zIndex: 1,
+          zIndex: 2,
           pointerEvents: 'none'
         })
         let el = this.getBlockEl(this.getOverElementFromTouch(event))
@@ -80,16 +91,19 @@ export default {
 
         this.lock = true
         const targetIndex = el.getAttribute('data-index')
-        // console.log(this.arr[index].left)
+        this.targetItem = this.arr[targetIndex]
+
         this.$set(this.arr, targetIndex, {
-          ...this.arr[targetIndex],
-          left: this.checkedItem.left,
-          top: this.checkedItem.top,
+          ...this.targetItem,
+          left: this.left,
+          top: this.top,
           transition: 'all 0.4s ease'
         })
+        this.top = this.targetItem.top
+        this.left = this.targetItem.left
         this.resetTimer = setTimeout(() => {
-          this.$set(this.arr, index, {
-            ...this.arr[index],
+          this.$set(this.arr, targetIndex, {
+            ...this.arr[targetIndex],
             transition: null
           })
           this.lock = false
@@ -98,23 +112,26 @@ export default {
       }
     },
     doTouchEnd (event, index) {
+      const left = this.targetItem ? this.targetItem.left : this.checkedItem.left
+      const top = this.targetItem ? this.targetItem.top : this.checkedItem.top
       this.$set(this.arr, index, {
         ...this.arr[index],
         transition: 'all 0.4s ease',
-        left: this.checkedItem.left,
-        top: this.checkedItem.top,
-        isShaking: true
+        left,
+        top,
+        isShaking: true,
+        pointerEvents: null,
+        zIndex: 1
       })
 
-      this.resetTimer = setTimeout(() => {
-        this.$set(this.arr, index, {
-          ...this.arr[index],
-          transition: null,
-          zIndex: null,
-          pointerEvents: null
-        })
-        clearTimeout(this.resetTimer)
-      }, 400)
+      // this.resetTimer = setTimeout(() => {
+      //   this.$set(this.arr, index, {
+      //     ...this.arr[index],
+      //     transition: null,
+      //     zIndex: null
+      //   })
+      //   clearTimeout(this.resetTimer)
+      // }, 400)
       clearTimeout(this.timer)
       if (!this.longClick) {
         this.animat = false
@@ -160,7 +177,6 @@ export default {
   margin auto
   width 26em
   height 20em
-  // background-color #F5F5F5
   .box
     position absolute
     display inline-block
