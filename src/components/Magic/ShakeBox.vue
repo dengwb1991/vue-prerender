@@ -44,6 +44,14 @@ export default {
         { text: 'G', color: 'pink' },
         { text: 'W', color: 'white' },
         { text: 'B', color: 'orange' }
+      ],
+      result: [
+        { text: 'D', color: 'red' },
+        { text: 'E', color: 'yellow' },
+        { text: 'N', color: 'blue' },
+        { text: 'G', color: 'pink' },
+        { text: 'W', color: 'white' },
+        { text: 'B', color: 'orange' }
       ]
     }
   },
@@ -64,84 +72,71 @@ export default {
       }
       this.top = this.arr[index].top
       this.left = this.arr[index].left
-      this.$set(this.arr, index, {
-        ...this.arr[index],
-        transition: null
-      })
+      this.setArray(index, { transition: null })
     },
-    doTouchMove (event, index) {
+    doTouchMove (event) {
       event.preventDefault()
       clearTimeout(this.timer)
-      if (this.longClick) {
-        let x = event.touches[0].pageX - this.checkedItem.x
-        let y = event.touches[0].pageY - this.checkedItem.y
-        this.$set(this.arr, index, {
-          ...this.arr[index],
-          left: x + this.checkedItem.left,
-          top: y + this.checkedItem.top,
-          isShaking: false,
-          zIndex: 2,
-          pointerEvents: 'none'
-        })
-        let el = this.getBlockEl(this.getOverElementFromTouch(event))
+      if (!this.longClick) return
 
-        if (!el || !this.checkedItem) return
+      const CI = this.checkedItem
+      this.setArray(CI.index, {
+        left: event.touches[0].pageX - CI.x + CI.left,
+        top: event.touches[0].pageY - CI.y + CI.top,
+        isShaking: false,
+        zIndex: 1,
+        pointerEvents: 'none'
+      })
+      const el = this.getBlockEl(this.getOverElementFromTouch(event))
 
-        if (this.lock || !el.getAttribute('class') || !el.getAttribute('class').includes('animat') || el === this.checkedItem.el) return
+      if (!el || !CI || this.lock || !el.getAttribute('class') || !el.getAttribute('class').includes('animat') || el === CI.el) return
 
-        this.lock = true
-        const targetIndex = el.getAttribute('data-index')
-        this.targetItem = this.arr[targetIndex]
+      this.lock = true
+      const targetIndex = el.getAttribute('data-index')
+      const TI = this.targetItem = this.arr[targetIndex]
 
-        this.$set(this.arr, targetIndex, {
-          ...this.targetItem,
-          left: this.left,
-          top: this.top,
-          transition: 'all 0.4s ease'
-        })
-        this.top = this.targetItem.top
-        this.left = this.targetItem.left
-        this.resetTimer = setTimeout(() => {
-          this.$set(this.arr, targetIndex, {
-            ...this.arr[targetIndex],
-            transition: null
-          })
-          this.lock = false
-          clearTimeout(this.resetTimer)
-        }, 400)
-      }
+      this.setArray(targetIndex, {
+        left: this.left,
+        top: this.top,
+        transition: 'all 0.4s ease'
+      })
+
+      this.top = TI.top
+      this.left = TI.left
+      this.resetTimer = setTimeout(() => {
+        this.lock = false
+      }, 400)
     },
-    doTouchEnd (event, index) {
-      const left = this.targetItem ? this.targetItem.left : this.checkedItem.left
-      const top = this.targetItem ? this.targetItem.top : this.checkedItem.top
-      this.$set(this.arr, index, {
-        ...this.arr[index],
+    doTouchEnd (event) {
+      const CI = this.checkedItem
+      const TI = this.targetItem
+      const left = TI ? TI.left : CI.left
+      const top = TI ? TI.top : CI.top
+
+      this.setArray(CI.index, {
         transition: 'all 0.4s ease',
         left,
         top,
         isShaking: true,
         pointerEvents: null,
-        zIndex: 1
+        zIndex: 2
       })
-
-      // this.resetTimer = setTimeout(() => {
-      //   this.$set(this.arr, index, {
-      //     ...this.arr[index],
-      //     transition: null,
-      //     zIndex: null
-      //   })
-      //   clearTimeout(this.resetTimer)
-      // }, 400)
+      this.resetTimer = setTimeout(() => {
+        this.setArray(CI.index, { zIndex: null })
+        clearTimeout(this.resetTimer)
+      }, 400)
       clearTimeout(this.timer)
       if (!this.longClick) {
         this.animat = false
       }
       return false
     },
+    setArray (index, obj) {
+      this.$set(this.arr, index, { ...this.arr[index], ...obj })
+    },
     getOverElementFromTouch (event) {
       const touch = event.touches[0]
-      const el = document.elementFromPoint(touch.clientX, touch.clientY)
-      return el
+      return document.elementFromPoint(touch.clientX, touch.clientY)
     },
     getBlockEl (el) {
       if (!el) return
@@ -186,7 +181,6 @@ export default {
     border-radius 10px
     text-align center
     line-height 4em
-    // transition all 0.4s ease
   .animat
     animation shake-crazy .75s infinite linear
   .animat:nth-child(2n)
@@ -195,25 +189,25 @@ export default {
     animation shake-crazy .7s infinite linear
 @keyframes shake-crazy {
   0% {
-    transform: translate(0px, 0px) rotate(0deg);
+    transform: translate3d(0, 0, 0) rotate(0deg);
   }
   17% {
-    transform: translate(.2px, .2px) rotate(4deg)
+    transform: translate3d(.2px, .2px, 0) rotate(4deg)
   }
   34% {
-    transform: translate(-.2px, -.2px) rotate(-4deg)
+    transform: translate3d(-.2px, -.2px, 0) rotate(-4deg)
   }
   51% {
-    transform: translate(0px, -.4px) rotate(0deg)
+    transform: translate3d(0px, -.4px, 0) rotate(0deg)
   }
   68% {
-    transform: translate(.2px, -.2px) rotate(4deg)
+    transform: translate3d(.2px, -.2px, 0) rotate(4deg)
   }
   85% {
-    transform: translate(-.2px, .2px) rotate(-4deg)
+    transform: translate3d(-.2px, .2px, 0) rotate(-4deg)
   }
   100% {
-    transform:translate(0px, .4px) rotate(0deg)
+    transform: translate3d(0px, .4px, 0) rotate(0deg)
   }
 }
 </style>
