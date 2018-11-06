@@ -1,6 +1,6 @@
 <!-- 抖动 -->
 <template>
-  <div class="aaa">
+  <div>
     <div class="shake-box">
       <div :class="['box', item.isShaking !== false && isAnimation]"
            v-for="(item, index) in arr"
@@ -14,14 +14,13 @@
            }"
            :data-index="index"
            :key="index"
-           @touchstart="doTouchStart($event, item, index)"
-           @touchmove="doTouchMove($event, index)"
-           @touchend="doTouchEnd($event, index)">
+           @touchstart="doTouchStart($event, item, item._index)"
+           @touchmove="doTouchMove($event)"
+           @touchend="doTouchEnd($event)">
         {{item.text}}
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -38,20 +37,12 @@ export default {
       top: 0,
       left: 0,
       arr: [
-        { text: 'D', color: 'red' },
-        { text: 'E', color: 'yellow' },
-        { text: 'N', color: 'blue' },
-        { text: 'G', color: 'pink' },
-        { text: 'W', color: 'white' },
-        { text: 'B', color: 'orange' }
-      ],
-      result: [
-        { text: 'D', color: 'red' },
-        { text: 'E', color: 'yellow' },
-        { text: 'N', color: 'blue' },
-        { text: 'G', color: 'pink' },
-        { text: 'W', color: 'white' },
-        { text: 'B', color: 'orange' }
+        { text: 'D', color: 'red', _index: 0 },
+        { text: 'E', color: 'yellow', _index: 1 },
+        { text: 'N', color: 'blue', _index: 2 },
+        { text: 'G', color: 'pink', _index: 3 },
+        { text: 'W', color: 'white', _index: 4 },
+        { text: 'B', color: 'orange', _index: 5 }
       ]
     }
   },
@@ -93,6 +84,7 @@ export default {
 
       this.lock = true
       const targetIndex = el.getAttribute('data-index')
+      console.log(targetIndex)
       const TI = this.targetItem = this.arr[targetIndex]
 
       this.setArray(targetIndex, {
@@ -100,11 +92,15 @@ export default {
         top: this.top,
         transition: 'all 0.4s ease'
       })
-
       this.top = TI.top
       this.left = TI.left
+
       this.resetTimer = setTimeout(() => {
         this.lock = false
+        this.setArray(targetIndex, { transition: null })
+        let index = this.arr[targetIndex]._index
+        this.arr[targetIndex]._index = this.arr[CI.index]._index
+        this.arr[CI.index]._index = index
       }, 400)
     },
     doTouchEnd (event) {
@@ -122,7 +118,8 @@ export default {
         zIndex: 2
       })
       this.resetTimer = setTimeout(() => {
-        this.setArray(CI.index, { zIndex: null })
+        this.setArray(CI.index, { zIndex: null, transition: null })
+        this.arr.sort((prev, curr) => +prev._index - +curr._index)
         clearTimeout(this.resetTimer)
       }, 400)
       clearTimeout(this.timer)
