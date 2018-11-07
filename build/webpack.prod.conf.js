@@ -33,7 +33,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     new PrerenderSpaPlugin(
       path.join(config.build.assetsRoot),
-      [ '/', '/home']
+      [ '/', '/home', '/magic/shakeBox', '/upload']
     ),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
