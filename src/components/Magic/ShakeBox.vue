@@ -84,7 +84,6 @@ export default {
 
       this.lock = true
       const targetIndex = el.getAttribute('data-index')
-      console.log(targetIndex)
       const TI = this.targetItem = this.arr[targetIndex]
 
       this.setArray(targetIndex, {
