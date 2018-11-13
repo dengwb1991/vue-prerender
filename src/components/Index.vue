@@ -36,6 +36,9 @@ export default {
   font-size 20px
   animation flicker 1s linear infinite
 }
+.me:hover {
+  cursor: pointer
+}
 @keyframes flicker {
   0% {
     opacity .3
