@@ -15,6 +15,8 @@
 
 <script>
 import logo from '@/assets/images/dengwb.png'
+// import { track, before, after } from '../plugins/track.js'
+// import { defaultResult } from '../plugins/decorator.js'
 export default {
   data () {
     return {
@@ -22,8 +24,13 @@ export default {
     }
   },
   methods: {
+    // @track(after(() => console.log('click after')))
+    // @defaultResult('trackName')
     toWelcome () {
-      location.assign('https://www.dengwb.com/app/welcome.html')
+      // return new Promise((resolve, reject) => {
+      //   resolve({a: 2})
+      // })
+      // location.assign('https://www.dengwb.com/app/welcome.html')
     }
   }
 }
