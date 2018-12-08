@@ -11,7 +11,6 @@ export function trackEvent ({ trackName, trackAttr, callback }) {
     reject(err)
   })
 }
-
 // export function trackEvent ({ trackName, trackAttr, callback }) {
 //   console.log(trackName, trackAttr, callback)
 //   return new Promise((resolve, reject) => {
@@ -36,9 +35,3 @@ export function trackEvent ({ trackName, trackAttr, callback }) {
 //     callBack && callBack()
 //   }
 // }
-
-
-
-
-
-
