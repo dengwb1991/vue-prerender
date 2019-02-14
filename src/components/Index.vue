@@ -30,7 +30,7 @@ export default {
       // return new Promise((resolve, reject) => {
       //   resolve({a: 2})
       // })
-      // location.assign('https://www.dengwb.com/app/welcome.html')
+      location.assign('https://www.dengwb.com/app/welcome.html')
     }
   }
 }
